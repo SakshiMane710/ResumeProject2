@@ -14,7 +14,19 @@ const lists = document.querySelectorAll('.list');
 function initCard(card) {
   card.addEventListener('dragstart', dragStart);
   card.addEventListener('dragend', dragEnd);
+  
+  card.addEventListener('click', (e) => {
+    if (e.target.classList.contains('delete-btn')) return;
+    activeCard = card;
+    modalTitle.textContent = card.querySelector('.card-text')?.textContent || '';
+    modalDescription.value = card.dataset.description || '';
+    const dueDateInput = document.getElementById('modalDueDate');
+    if (dueDateInput) dueDateInput.value = card.dataset.dueDate || '';
+    document.getElementById('cardModal').classList.remove('hidden');
+  });
+
   addDeleteButton(card);
+  updateDueDateBadge(card);
 }
 
 document.querySelectorAll('.card').forEach(initCard);
@@ -28,11 +40,11 @@ lists.forEach(list => {
 
 function dragStart(e) {
   e.dataTransfer.setData('text/plain', e.target.id);
-  setTimeout(() => (e.target.style.display = 'none'), 0);
+  setTimeout(() => e.target.classList.add('dragging'), 0);
 }
 
 function dragEnd(e) {
-  e.target.style.display = 'block';
+  e.target.classList.remove('dragging');
 }
 
 function dragOver(e) {
@@ -62,7 +74,9 @@ function dragDrop(e) {
   target.insertBefore(card, target.querySelector('.add-card'));
   target.classList.remove('over');
 
+  updateDueDateBadge(card);
   saveBoardToLocalStorage();
+  updateCounts();
 }
 
 // ====================
@@ -74,7 +88,9 @@ document.querySelectorAll('.add-card button').forEach(button => {
     const wrapper = button.parentElement;
     const input = wrapper.querySelector('.card-input');
     const priority = wrapper.querySelector('.card-priority').value;
+    const dueDateInput = wrapper.querySelector('.card-due-date');
     const text = input.value.trim();
+    const dueDate = dueDateInput ? dueDateInput.value : '';
 
     if (!text) return;
 
@@ -88,12 +104,19 @@ document.querySelectorAll('.add-card button').forEach(button => {
     textSpan.textContent = text;
 
     card.appendChild(textSpan);
+    
+    if (dueDate) {
+      card.dataset.dueDate = dueDate;
+    }
+    
     initCard(card);
 
     wrapper.closest('.list').insertBefore(card, wrapper);
     input.value = '';
+    if (dueDateInput) dueDateInput.value = '';
 
     saveBoardToLocalStorage();
+    updateCounts();
   });
 });
 
@@ -108,9 +131,13 @@ function addDeleteButton(card) {
   btn.className = 'delete-btn';
   btn.textContent = '❌';
 
-  btn.addEventListener('click', () => {
-    card.remove();
-    saveBoardToLocalStorage();
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (confirm('Are you sure you want to delete this card?')) {
+      card.remove();
+      saveBoardToLocalStorage();
+      updateCounts();
+    }
   });
 
   card.appendChild(btn);
@@ -136,7 +163,8 @@ function saveBoardToLocalStorage() {
         ? 'medium'
         : 'low',
       listId: card.closest('.list').id,
-      description: card.dataset.description || ''
+      description: card.dataset.description || '',
+      dueDate: card.dataset.dueDate || ''
     });
   });
 
@@ -161,11 +189,15 @@ function loadBoardFromLocalStorage() {
     textSpan.textContent = item.text;
 
     card.appendChild(textSpan);
+    if (item.description) card.dataset.description = item.description;
+    if (item.dueDate) card.dataset.dueDate = item.dueDate;
+    
     initCard(card);
 
     const list = document.getElementById(item.listId);
     list.insertBefore(card, list.querySelector('.add-card'));
   });
+  updateCounts();
 }
 
 loadBoardFromLocalStorage();
@@ -195,29 +227,17 @@ themeToggle.addEventListener('click', () => {
 // MODAL SETUP
 // ====================
 
+// Open modal logic is now handled in initCard() so it works for all new cards
+
+
 const modal = document.getElementById('cardModal');
 const modalTitle = document.getElementById('modalTitle');
 const modalDescription = document.getElementById('modalDescription');
+const modalDueDate = document.getElementById('modalDueDate');
 const saveBtn = document.getElementById('saveCardDetails');
 const closeBtn = document.querySelector('.close-btn');
 
 let activeCard = null; // the card being edited
-
-// Open modal on card click
-document.querySelectorAll('.card').forEach(card => {
-  card.addEventListener('click', (e) => {
-    // Prevent clicks on delete button from opening modal
-    if (e.target.classList.contains('delete-btn')) return;
-
-    activeCard = card;
-
-    modalTitle.textContent = card.querySelector('.card-text')?.textContent || '';
-    modalDescription.value = card.dataset.description || '';
-
-    modal.classList.remove('hidden');
-  });
-});
-
 
 // Save card details
 saveBtn.addEventListener('click', () => {
@@ -229,14 +249,186 @@ saveBtn.addEventListener('click', () => {
     textSpan.textContent = modalTitle.textContent.trim();
   }
 
-  // Save description as dataset
+  // Save description and due date as dataset
   activeCard.dataset.description = modalDescription.value.trim();
+  activeCard.dataset.dueDate = modalDueDate.value;
+  updateDueDateBadge(activeCard);
 
   modal.classList.add('hidden');
   saveBoardToLocalStorage(); // include description in save later
+  updateCounts();
 });
 
 // Close modal
 closeBtn.addEventListener('click', () => {
   modal.classList.add('hidden');
 });
+
+// ====================
+// NEW FEATURES
+// ====================
+
+// Updates or creates the due date badge on a card
+function updateDueDateBadge(card) {
+  let badge = card.querySelector('.due-date-badge');
+  const dueDate = card.dataset.dueDate;
+  
+  if (!dueDate) {
+    if (badge) badge.remove();
+    return;
+  }
+  
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.className = 'due-date-badge';
+    card.appendChild(badge);
+  }
+  
+  badge.textContent = dueDate;
+  badge.className = 'due-date-badge'; // reset classes
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  // parse the date from input which is YYYY-MM-DD
+  const [year, month, day] = dueDate.split('-');
+  const due = new Date(year, month - 1, day);
+  
+  const isDone = card.closest('.list')?.id === 'list3';
+  
+  if (isDone) {
+    badge.classList.add('future');
+  } else if (due < today) {
+    badge.classList.add('overdue');
+  } else if (due.getTime() === today.getTime()) {
+    badge.classList.add('today');
+  } else {
+    badge.classList.add('future');
+  }
+}
+
+// Updates the card count next to each column title
+function updateCounts() {
+  document.querySelectorAll('.list').forEach(list => {
+    // Count all cards that are not hidden by the filter
+    const count = list.querySelectorAll('.card:not(.hidden-filter)').length;
+    const countSpan = list.querySelector('.count');
+    if (countSpan) countSpan.textContent = count;
+  });
+}
+
+// Search and Priority Filter
+const searchInput = document.getElementById('searchInput');
+const priorityFilter = document.getElementById('priorityFilter');
+let searchTimeout;
+
+// Filters cards by title, description and priority dropdown
+function filterCards() {
+  const text = searchInput.value.toLowerCase();
+  const priority = priorityFilter.value;
+  
+  document.querySelectorAll('.card').forEach(card => {
+    const title = card.querySelector('.card-text').textContent.toLowerCase();
+    const desc = (card.dataset.description || '').toLowerCase();
+    const matchText = title.includes(text) || desc.includes(text);
+    const matchPriority = priority === 'all' || card.classList.contains(priority);
+    
+    if (matchText && matchPriority) {
+      card.classList.remove('hidden-filter');
+    } else {
+      card.classList.add('hidden-filter');
+    }
+  });
+  updateCounts();
+}
+
+if(searchInput) {
+  searchInput.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(filterCards, 300);
+  });
+}
+
+if(priorityFilter) {
+  priorityFilter.addEventListener('change', filterCards);
+}
+
+// Export / Import Board
+const exportBtn = document.getElementById('exportBtn');
+const importBtn = document.getElementById('importBtn');
+const importFile = document.getElementById('importFile');
+
+// Exports the current board as board.json
+if(exportBtn) {
+  exportBtn.addEventListener('click', () => {
+    const data = localStorage.getItem('kanbanBoard') || '[]';
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'board.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
+if(importBtn) {
+  // Triggers the hidden file input
+  importBtn.addEventListener('click', () => importFile.click());
+}
+
+if(importFile) {
+  // Reads and loads a JSON file when selected
+  importFile.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (!Array.isArray(data)) throw new Error('Not an array');
+        localStorage.setItem('kanbanBoard', JSON.stringify(data));
+        loadBoardFromLocalStorage();
+      } catch (err) {
+        alert('Invalid file format. Please upload a valid board.json file.');
+      }
+      importFile.value = ''; // Reset input
+    };
+    reader.readAsText(file);
+  });
+}
+
+// Checks for any overdue tasks on page load and shows a popup alert
+function checkOverdueTasks() {
+  const overdueCards = [];
+  
+  document.querySelectorAll('.card').forEach(card => {
+    // Skip if task is in "done" column
+    if (card.closest('.list')?.id === 'list3') return;
+    
+    const dueDate = card.dataset.dueDate;
+    if (dueDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const [year, month, day] = dueDate.split('-');
+      const due = new Date(year, month - 1, day);
+      
+      if (due < today) {
+        const title = card.querySelector('.card-text')?.textContent || 'Untitled Task';
+        overdueCards.push(title);
+      }
+    }
+  });
+
+  if (overdueCards.length > 0) {
+    // Show alert slightly after page load so it doesn't block rendering
+    setTimeout(() => {
+      alert(`You have ${overdueCards.length} overdue task(s)!\n\n` + overdueCards.map(t => `- ${t}`).join('\n'));
+    }, 500);
+  }
+}
+
+// Run the check when the page loads
+checkOverdueTasks();
+
+

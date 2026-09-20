@@ -4,23 +4,40 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kanban Board</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-      <button id="toggleTheme" class="theme-toggle">🌙 Toggle Dark Mode</button>
   <div class="container">
-    <h1>Kanban To-Do board</h1>
-
+    <header class="app-header">
+      <div class="header-top">
+        <h1>Kanban Board</h1>
+        <button id="toggleTheme" class="theme-toggle">🌙 Dark Mode</button>
+      </div>
+      <div class="controls">
+        <input type="text" id="searchInput" placeholder="Search tasks..." />
+        <select id="priorityFilter">
+          <option value="all">All Priorities</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+        <button id="exportBtn">Export</button>
+        <button id="importBtn">Import</button>
+        <input type="file" id="importFile" accept=".json" hidden />
+      </div>
+    </header>
 
     <div class="board">
 
       <!-- list1 -->
       <div class="list" id="list1">
-        <h2>todo</h2>
+        <h2>todo <span class="count">0</span></h2>
         <div class="card" draggable="true" id="card1">Wash Dishes</div>
         <div class="card" draggable="true" id="card2">Buy Groceries</div>
         <div class="add-card">
           <input type="text" class="card-input" placeholder="New task..." />
+          <input type="date" class="card-due-date" title="Due Date" />
           <select class="card-priority">
             <option value="low">Low</option>
             <option value="medium" selected>Medium</option>
@@ -32,10 +49,11 @@
 
       <!-- list2 -->
       <div class="list" id="list2">
-        <h2>in progress</h2>
+        <h2>in progress <span class="count">0</span></h2>
         <div class="card" draggable="true" id="card3">Learn to Code</div>
         <div class="add-card">
           <input type="text" class="card-input" placeholder="New task..." />
+          <input type="date" class="card-due-date" title="Due Date" />
           <select class="card-priority">
             <option value="low">Low</option>
             <option value="medium" selected>Medium</option>
@@ -47,10 +65,11 @@
 
       <!-- list3 -->
       <div class="list" id="list3">
-        <h2>done</h2>
+        <h2>done <span class="count">0</span></h2>
         <div class="card" draggable="true" id="card4">Do Laundry</div>
         <div class="add-card">
           <input type="text" class="card-input" placeholder="New task..." />
+          <input type="date" class="card-due-date" title="Due Date" />
           <select class="card-priority">
             <option value="low">Low</option>
             <option value="medium" selected>Medium</option>
@@ -67,6 +86,7 @@
   <div class="modal-content">
     <span class="close-btn">✖</span>
     <h2 contenteditable="true" id="modalTitle">Card Title</h2>
+    <input type="date" id="modalDueDate" title="Due Date" />
     <textarea id="modalDescription" placeholder="Add a description..."></textarea>
     <button id="saveCardDetails">💾 Save</button>
   </div>

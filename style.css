@@ -3,9 +3,11 @@
 ======================================== */
 :root {
   --bg: #f8f9fc;
+  --bg-image: url('https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?q=80&w=2500&auto=format&fit=crop'); /* Bright desk with notepad and coffee */
+  --bg-overlay: rgba(255, 255, 255, 0.65);
   --card-bg: #fffdfb;
   --text: #1a202c;
-  --list-bg: #e5e7eb;
+  --list-bg: rgba(229, 231, 235, 0.85);
   --button-bg: #3A0CA3;
   --button-text: #ffffff;
   --input-bg: #e5e7eb;
@@ -14,9 +16,11 @@
 
 body.dark {
   --bg: #1e1e2f;
+  --bg-image: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2500&auto=format&fit=crop'); /* Dark library / books */
+  --bg-overlay: rgba(15, 15, 25, 0.85);
   --card-bg: #2e2e3e;
   --text: #f5f5f5;
-  --list-bg: #3a3a4d;
+  --list-bg: rgba(58, 58, 77, 0.85);
   --button-bg: #6C63FF;
   --button-text: #ffffff;
   --input-bg: #44455a;
@@ -35,12 +39,17 @@ body.dark {
 body {
   font-family: 'Segoe UI', sans-serif;
   background-color: var(--bg);
+  background-image: linear-gradient(var(--bg-overlay), var(--bg-overlay)), var(--bg-image);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   color: var(--text);
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   overflow-x: hidden;
+  transition: background-image 0.5s ease;
 }
 
 .container {
@@ -184,7 +193,7 @@ h1 {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.add-card input.card-input {
+.add-card input.card-input, .add-card input.card-due-date {
   padding: 10px;
   border: none;
   border-radius: 6px;
@@ -193,9 +202,10 @@ h1 {
   color: var(--text);
   outline: none;
   transition: box-shadow 0.2s ease;
+  font-family: inherit;
 }
 
-.add-card input.card-input:focus {
+.add-card input.card-input:focus, .add-card input.card-due-date:focus {
   box-shadow: 0 0 0 2px var(--button-bg);
 }
 
@@ -364,4 +374,83 @@ body.dark .card.high {
   font-size: 20px;
   cursor: pointer;
   color: var(--delete-btn);
+}
+
+/* ========================================
+   New Feature Styles
+======================================== */
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.controls input, .controls select, .controls button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--input-bg);
+  background-color: var(--card-bg);
+  color: var(--text);
+  outline: none;
+}
+
+.controls button {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+}
+
+.controls button:hover {
+  background-color: #5f27cd;
+}
+
+/* Hidden filter for search */
+.hidden-filter {
+  display: none !important;
+}
+
+/* Count badge */
+.list h2 .count {
+  font-size: 1rem;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* Due date badge */
+.due-date-badge {
+  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  margin-top: 8px;
+  display: inline-block;
+  font-weight: bold;
+}
+.due-date-badge.overdue { background-color: #ff4d4d; color: white; }
+.due-date-badge.today { background-color: #ffa500; color: white; }
+.due-date-badge.future { background-color: #e5e7eb; color: #1a202c; }
+
+body.dark .due-date-badge.future { background-color: #44455a; color: #f5f5f5; }
+
+body.dark .controls input, body.dark .controls select {
+  background-color: var(--input-bg);
+  border-color: var(--card-bg);
+}
+
+#modalDueDate {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--input-bg);
+  color: var(--text);
+  font-family: inherit;
 }
