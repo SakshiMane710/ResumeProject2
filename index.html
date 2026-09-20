@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kanban Board</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <div class="container">
     <header class="app-header">
@@ -33,8 +35,8 @@
       <!-- list1 -->
       <div class="list" id="list1">
         <h2>todo <span class="count">0</span></h2>
-        <div class="card" draggable="true" id="card1">Wash Dishes</div>
-        <div class="card" draggable="true" id="card2">Buy Groceries</div>
+        <div class="card" draggable="true" id="card1">HTML Study Playlist Video 1</div>
+        <div class="card" draggable="true" id="card2">Assinment Completion</div>
         <div class="add-card">
           <input type="text" class="card-input" placeholder="New task..." />
           <input type="date" class="card-due-date" title="Due Date" />
@@ -82,16 +84,17 @@
     </div>
   </div>
   <!-- Card Modal -->
-<div id="cardModal" class="modal hidden">
-  <div class="modal-content">
-    <span class="close-btn">✖</span>
-    <h2 contenteditable="true" id="modalTitle">Card Title</h2>
-    <input type="date" id="modalDueDate" title="Due Date" />
-    <textarea id="modalDescription" placeholder="Add a description..."></textarea>
-    <button id="saveCardDetails">💾 Save</button>
+  <div id="cardModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn">✖</span>
+      <h2 contenteditable="true" id="modalTitle">Card Title</h2>
+      <input type="date" id="modalDueDate" title="Due Date" />
+      <textarea id="modalDescription" placeholder="Add a description..."></textarea>
+      <button id="saveCardDetails">💾 Save</button>
+    </div>
   </div>
-</div>
 
   <script src="script.js"></script>
 </body>
+
 </html>
