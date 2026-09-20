@@ -5,7 +5,8 @@ A responsive Kanban board to organise tasks across To Do, In Progress and Done c
 🔗 **Live Demo:** [https://SakshiMane710.github.io/ResumeProject2/](https://SakshiMane710.github.io/ResumeProject2/)  
 📁 **Repository:** [https://github.com/SakshiMane710/ResumeProject2](https://github.com/SakshiMane710/ResumeProject2)
 
-<img width="1790" height="789" alt="image" src="https://github.com/user-attachments/assets/55340c35-067f-4803-9d8f-3115613f957f" />
+<img width="1917" height="922" alt="image" src="https://github.com/user-attachments/assets/59149375-9535-4d72-9704-8220d3b61775" />
+
 
 ## Features
 - Drag and drop tasks between columns (HTML5 Drag and Drop API)
