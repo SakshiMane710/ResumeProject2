@@ -2,7 +2,7 @@
 
 A responsive Kanban board to organise tasks across To Do, In Progress and Done columns. Built with plain HTML, CSS and JavaScript, with no frameworks or libraries.
 
-🔗 **Live Demo:** [https://maznu007.github.io/DragDropToDo/](https://maznu007.github.io/DragDropToDo/)  
+🔗 **Live Demo:** [https://SakshiMane710.github.io/ResumeProject2/](https://SakshiMane710.github.io/ResumeProject2/)  
 📁 **Repository:** [https://github.com/SakshiMane710/ResumeProject2](https://github.com/SakshiMane710/ResumeProject2)
 
 <img width="1790" height="789" alt="image" src="https://github.com/user-attachments/assets/55340c35-067f-4803-9d8f-3115613f957f" />
